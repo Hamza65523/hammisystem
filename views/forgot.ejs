@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forgot Password</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Forgot Password</h1>
+        <form action="/api/login/forgot-password" method="POST">
+            <div class="form-group">
+                <label class="label" for="email">Email</label>
+                <input class="input" type="email" id="email" name="email" placeholder="Email" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <% if (typeof data !== 'undefined') { %>
+            <p class="<%= data.status ? 'success' : 'error' %>"><%= data.message %></p>
+            <% } %>
+    </div>
+</body>
+</html>
