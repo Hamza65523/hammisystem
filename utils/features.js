@@ -14,12 +14,6 @@ const cookieSetter = (res, token, set) => {
   );
 };
 
-const generateToken = (user) => {
-  return jwt.sign({ _id: user._id,
-    name: user.name,
-    role:user.name,
-    email: user.email}, process.env.JWT_SECRET_KEY);
-};
 
 const checkAuth = async (req,res,next) => {
   try {
@@ -42,6 +36,5 @@ const checkAuth = async (req,res,next) => {
 
 module.exports ={
 cookieSetter,
-generateToken,
 checkAuth,
 }

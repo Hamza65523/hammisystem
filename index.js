@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const { body, validationResult } = require('express-validator');
 const {
   register,
 login,
@@ -11,7 +10,6 @@ Identity,
 const { checkAuth } = require("./utils/features");
 const app = express();
 const bodyParser = require('body-parser')
-const User = require('./models/user')
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,12 +22,11 @@ app.use(cors());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + "/public"));
-app.use("/uploads", express.static("uploads"));
 
 
 app.use("/api/register", register);
 app.use("/api/login", login);
-app.use("/api/logout", logout);
+app.use("/api/logout",checkAuth, logout);
 app.use("/api/identity", checkAuth, Identity);
 
 app.get("/", (req, res) => {
