@@ -3,7 +3,7 @@ const User  = require("../models/user");
 const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
-const {generateToken,verifyToken} = require("../utils/features");
+const {generateToken,verifyToken, cookieSetter} = require("../utils/features");
 
 const nodemailer = require('nodemailer')
 router.post("/", async (req, res) => {
@@ -24,7 +24,8 @@ router.post("/", async (req, res) => {
   if (!validPassword) return res.status(400).render('login', { data: { status: false, message: 'Invalid password...' }, });
   
   let token = generateToken(user)
-res.status(200).render('login', { data: { status: true, message: 'Login Successfully...',token }, });
+  cookieSetter(res, token, true);
+res.status(200).render('login', { data: { status: true, message: 'Login Successfully...' }, });
   
 } catch (err) {
   return  res.status(500).render('login', { data: { status: false, message: err.message }, });

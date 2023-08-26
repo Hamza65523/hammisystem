@@ -5,10 +5,11 @@ const {
   register,
 login,
 Identity,
+logout,
 } = require("./routes/index");
-const { auth } = require("./middleware/auth");
 const app = express();
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const { checkAuth } = require("./utils/features");
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,7 +26,8 @@ app.use(express.static(__dirname + "/public"));
 
 app.use("/api/register", register);
 app.use("/api/login", login);
-app.use("/api/identity", auth, Identity);
+app.use("/api/logout", checkAuth,logout);
+app.use("/api/identity", checkAuth, Identity);
 
 app.get("/", (req, res) => {
   res.send("Welcome our Hammi system Api...");
