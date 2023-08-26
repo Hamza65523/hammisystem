@@ -3,8 +3,7 @@ const User  = require("../models/user");
 const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
-const {generateToken, cookieSetter} = require("../utils/features");
-const JWT = require("jsonwebtoken");
+const {generateToken,verifyToken} = require("../utils/features");
 
 const nodemailer = require('nodemailer')
 router.post("/", async (req, res) => {
@@ -24,10 +23,8 @@ router.post("/", async (req, res) => {
   const validPassword = await bcrypt.compare(req.body.password, user.password);
   if (!validPassword) return res.status(400).render('login', { data: { status: false, message: 'Invalid password...' }, });
   
-  const token = generateToken(user._id);
-  cookieSetter(res, token, true);
-  
-res.status(200).render('login', { data: { status: true, message: 'Login Successfully...',token:token }, });
+  let token = generateToken(user)
+res.status(200).render('login', { data: { status: true, message: 'Login Successfully...',token }, });
   
 } catch (err) {
   return  res.status(500).render('login', { data: { status: false, message: err.message }, });
@@ -64,6 +61,8 @@ const sendResetPasswordMail = async(name,email,link,res)=>{
       console.log("Message sent: %s", link);
       res.status(200).render('forgot', { data: { status: true, message: 'Reset link sent to your email' }, });
 }
+
+
 router.post('/forgot-password', async (req, res) => {
   const schema = Joi.object({
     email: Joi.string().min(3).max(200).required().email(),
@@ -77,12 +76,7 @@ router.post('/forgot-password', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).render('forgot', { data: { status: false, message: 'User not found' }, });
 
-    const secrect = process.env.JWT_SECRET_KEY 
-    const payload = {
-        email: user.email,
-        id:user._id
-    }
-    const token = JWT.sign(payload,secrect,{expiresIn:'15m'})
+   let token = generateToken(user)
     const link = `${process.env.BASEURL}/api/login/update-user/${user._id}/${token}`
     sendResetPasswordMail(user?.name,user?.email,link,res)
   } catch (error) {
@@ -153,17 +147,6 @@ if(status ==true){
 
 });
 
-const verifyToken=(token,secret)=>{
-return JWT.verify(token, secret, (err, decoded) => {
-  if (err) {
-    console.log(err)
-  return  {status:false}
-  } else {
-      console.log('Token verified:', decoded);
-      return {status:true,decoded}
-  }
-});
-}
 
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const User  = require("../models/user");
 const express = require("express");
-const {generateToken,cookieSetter,} = require("../utils/features");
+const {generateToken} = require("../utils/features");
 const router = express.Router();
 const Joi = require("joi");
 
@@ -30,8 +30,9 @@ router.post("/", async (req, res) => {
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
     
+    const token = generateToken(user._id);
     // Handle the successful registration scenario
-    res.status(201).render('registration', { data: { status: true, message: 'Registered Successfully' }, });
+    res.status(201).render('registration', { data: { status: true, message: 'Registered Successfully' },token });
 } catch (err) {
     console.error('Error during registration:', err);
     res.status(500).render('registration', { data: { status: false, message: 'An error occurred during registration' }, });
